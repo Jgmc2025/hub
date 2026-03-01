@@ -4,7 +4,8 @@ import {
   Search, FileText, Video, Link as LinkIcon, 
   Trash2, ChevronLeft, ChevronRight, ExternalLink, 
   Zap, FileStack,
-  Filter
+  Filter,
+  Edit3
 } from 'lucide-react';
 import Home from './Home';
 
@@ -112,8 +113,9 @@ const Appointment = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Título</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Tipo</th>
+                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Editar</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left">Recurso</th>
+                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Excluir</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -123,43 +125,63 @@ const Appointment = () => {
                   <tr><td colSpan="3" className="p-10 text-center text-slate-400 font-medium italic">Nenhum recurso encontrado no banco.</td></tr>
                 ) : currentItems.map((res) => (
                   <tr key={res.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-6">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-bold text-slate-800 tracking-tight">{res.title}</h4>
-                        <a href={res.url} target="_blank" rel="noreferrer" className="text-slate-300 hover:text-indigo-500 transition-colors">
-                          <ExternalLink size={14} />
-                        </a>
-                      </div>
-                      <p className="text-xs text-slate-500 line-clamp-2 max-w-md leading-relaxed mb-3">{res.description}</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {res.tags && res.tags.split(',').map((tag, i) => (
-                          <span key={i} className="text-[9px] bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-indigo-100/50">
-                            {tag.trim()}
-                          </span>
-                        ))}
-                      </div>
+                    <td className="px-6 py-6 text-center">
+                      <button 
+                        className="inline-flex items-center justify-center p-2.5 text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm"
+                        title="Editar recurso"
+                      >
+                        <Edit3 size={20} strokeWidth={2} />
+                      </button>
                     </td>
-                    <td className="px-6 py-6 text-right align-top">
-                      <div className="flex items-center justify-end gap-3">
-                        <button 
-                          onClick={() => deleteResource(res.id)}
-                          className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 active:scale-90"
-                          title="Excluir recurso"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                        <div className="flex items-center gap-2 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm w-fit group-hover:border-indigo-200 transition-colors">
-                          {getTypeIcon(res.resource_type)}
-                          <span className="text-[10px] font-bold text-slate-600 uppercase">{res.resource_type}</span>
+                    <td className="px-6 py-6 text-left">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
+                          <h4 className="font-bold text-slate-800 tracking-tight text-lg truncate">
+                            {res.title}
+                          </h4>
+                          <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 px-2 py-1 rounded-md shrink-0">
+                            {getTypeIcon(res.resource_type)}
+                            <span className="text-xs font-bold text-slate-600 tracking-tighter">
+                              {res.resource_type}
+                            </span>
+                          </div>
+                          <a 
+                            href={res.url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="flex items-center justify-center p-1.5 bg-slate-800 text-white rounded-md hover:bg-slate-900 transition-colors shadow-sm shrink-0" 
+                            title="Acessar URL"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        </div>
+                        <p className="text-sm text-slate-500 line-clamp-2 max-w-2xl leading-relaxed mb-3">
+                          {res.description}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {res.tags && res.tags.split(',').map((tag, i) => (
+                            <span key={i} className="text-xs bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded font-bold tracking-wider border border-indigo-100/50">
+                              {tag.trim()}
+                            </span>
+                          ))}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                      <button 
+                        onClick={() => deleteResource(res.id)}
+                        className="inline-flex items-center justify-center p-2.5 text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90 shadow-sm"
+                        title="Excluir recurso"
+                      >
+                        <Trash2 size={20} strokeWidth={2} />
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-tight">
-              <span>{filteredResources.length} Materiais no Total</span>
+              <span>{filteredResources.length} {filteredResources.length === 1 ? 'Material' : 'Materiais'}</span>
               <div className="flex gap-2">
                 <button 
                   disabled={currentPage === 1}
