@@ -2,9 +2,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap } from 'lucide-react';
 import Home from './Home';
+import Appointment from './Appointment';
 
 function App() {
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [view, setView] = useState('home');
   const [activeHelp, setActiveHelp] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null)
   const [isAdding, setIsAdding] = useState(false); 
@@ -146,21 +147,27 @@ function App() {
     }
     return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
   };
-  if (!showDashboard) {
-    return <Home onStart={() => setShowDashboard(true)} />;
+  if (view === 'home') {
+    return <Home onStart={() => setView('create')} />;
+  }
+  if (view === 'list') {
+    return <Appointment onBack={() => setView('create')} />;
   }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
-          onClick={() => setShowDashboard(false)} 
+          onClick={() => setView('home')}
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
           title="Voltar para a Home"
         >
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
+        <button onClick={() => setView('list')} className="text-sm font-bold text-indigo-600">
+             Ver Repositório
+          </button>
       </nav>
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Recurso</h1>
