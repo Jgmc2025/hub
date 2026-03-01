@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Search, FileText, Video, Link as LinkIcon, 
-  Edit3, Trash2, ChevronLeft, ChevronRight, ExternalLink, 
-  Zap, FileStack
+  Trash2, ChevronLeft, ChevronRight, ExternalLink, 
+  Zap, FileStack,
+  Filter
 } from 'lucide-react';
 import Home from './Home';
 
 const Appointment = () => {
+  const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,9 +39,11 @@ const Appointment = () => {
       }
     }
   };
-  const filteredResources = resources.filter(res => 
-    res.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredResources = resources.filter(res => {
+    const matchesTitle = res.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === 'Todos' || res.resource_type === filterType;
+    return matchesTitle && matchesType;
+  });
   const indexOfLastItem = currentPage * resourcesPerPage;
   const indexOfFirstItem = indexOfLastItem - resourcesPerPage;
   const currentItems = filteredResources.slice(indexOfFirstItem, indexOfLastItem);
@@ -68,23 +72,40 @@ const Appointment = () => {
       </nav>
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-white">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <FileStack className="text-indigo-600" size={24} />
-                Repositório de Recursos
-              </h1>
-              <p className="text-slate-500 text-sm mt-1 font-medium italic">Consulte e gerencie seus materiais didáticos.</p>
+          <div className="flex flex-col gap-6 mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <FileStack className="text-indigo-600" size={24} />
+                  Repositório de Recursos
+                </h1>
+                <p className="text-slate-500 text-sm mt-1 font-medium italic">Gerencie seus materiais didáticos.</p>
+              </div>
             </div>
-            <div className="relative group min-w-[280px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Pesquisar recurso..." 
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Filtrar por título..." 
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="relative min-w-[160px]">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <select 
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-600 appearance-none cursor-pointer"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="Todos">Todos os Tipos</option>
+                  <option value="Vídeo">Vídeos</option>
+                  <option value="PDF">PDFs</option>
+                  <option value="Link">Links</option>
+                </select>
+              </div>
             </div>
           </div>
           <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-inner">
@@ -102,13 +123,7 @@ const Appointment = () => {
                   <tr><td colSpan="3" className="p-10 text-center text-slate-400 font-medium italic">Nenhum recurso encontrado no banco.</td></tr>
                 ) : currentItems.map((res) => (
                   <tr key={res.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-4 align-top">
-                      <div className="flex items-center gap-2 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm w-fit group-hover:border-indigo-200 transition-colors">
-                        {getTypeIcon(res.resource_type)}
-                        <span className="text-[10px] font-bold text-slate-600 uppercase">{res.resource_type}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-6">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-bold text-slate-800 tracking-tight">{res.title}</h4>
                         <a href={res.url} target="_blank" rel="noreferrer" className="text-slate-300 hover:text-indigo-500 transition-colors">
@@ -124,18 +139,19 @@ const Appointment = () => {
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all active:scale-90" title="Editar">
-                          <Edit3 size={18} />
-                        </button>
+                    <td className="px-6 py-6 text-right align-top">
+                      <div className="flex items-center justify-end gap-3">
                         <button 
                           onClick={() => deleteResource(res.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all active:scale-90"
-                          title="Excluir"
+                          className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                          title="Excluir recurso"
                         >
                           <Trash2 size={18} />
                         </button>
+                        <div className="flex items-center gap-2 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm w-fit group-hover:border-indigo-200 transition-colors">
+                          {getTypeIcon(res.resource_type)}
+                          <span className="text-[10px] font-bold text-slate-600 uppercase">{res.resource_type}</span>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -167,5 +183,4 @@ const Appointment = () => {
     </div>
   );
 };
-
 export default Appointment;
