@@ -6,12 +6,15 @@ import {
   Zap, FileStack,
   Filter,
   Edit3,
-  Tag
+  Tag,
+  X
 } from 'lucide-react';
 import Home from './Home';
 import App from './App'
 
 const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
+  const [selectedResource, setSelectedResource] = useState(null);
+  const closeDetails = () => setSelectedResource(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTitle, setSearchTitle] = useState('');
   const [searchTags, setSearchTags] = useState('');
@@ -194,7 +197,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                       {resources.length > 0 && (
                         <button 
                           onClick={deleteAllResources}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all group/all"
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all group/all text-slate-700"
                           title="Excluir tudo"
                         >
                           <Trash2 size={14} className="group-hover/all:scale-110 transition-transform" />
@@ -220,7 +223,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                         <Edit3 size={18} strokeWidth={2} />
                       </button>
                     </td>
-                    <td className="px-6 py-6 text-left">
+                    <td className="px-6 py-6 text-left cursor-pointer group/card relative" onClick={() => setSelectedResource(res)}>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2 flex-wrap">
                           <h4 className="font-bold text-slate-800 tracking-tight text-lg truncate">
@@ -299,6 +302,88 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
           </div>
         </div>
       </div>
+      {selectedResource && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            onClick={closeDetails}
+          />
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in slide-in-from-bottom-4 duration-300">
+            <div className={`h-2 w-full ${
+              selectedResource.resource_type === 'Vídeo' ? 'bg-red-500' : 
+              selectedResource.resource_type === 'PDF' ? 'bg-blue-500' : 'bg-emerald-500'
+            }`} />
+            
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-slate-100 rounded-xl">
+                    {getTypeIcon(selectedResource.resource_type)}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      {selectedResource.resource_type}
+                    </span>
+                    <h2 className="text-2xl font-bold text-slate-800 leading-tight">
+                      {selectedResource.title}
+                    </h2>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeDetails}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-700 transition-colors"
+                >
+                  <X size={20} /> 
+                </button>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Descrição</h3>
+                  <p className="text-slate-600 leading-relaxed text-base bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    {selectedResource.description}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-3">Tags Relacionadas</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedResource.tags && selectedResource.tags.split(',').map((tag, i) => (
+                      <span key={i} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold border border-indigo-100 flex items-center gap-2">
+                        <Tag size={12} />
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-10 pt-6 flex gap-3">
+                <button 
+                  onClick={() => { onEdit(selectedResource); closeDetails(); }}
+                  className="p-3.5 text-slate-500 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm text-slate-700"
+                  title="Editar recurso"
+                >
+                  <Edit3 size={20} strokeWidth={2} />
+                </button>
+                <a 
+                  href={selectedResource.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98]"
+                >
+                  Acessar Conteúdo
+                  <ExternalLink size={18} />
+                </a>
+                <button 
+                  onClick={() => { deleteResource(selectedResource.id); closeDetails(); }}
+                  className="p-3.5 text-slate-500 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90 shadow-sm text-slate-700"
+                  title="Excluir recurso"
+                >
+                  <Trash2 size={20} strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
