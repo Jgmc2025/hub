@@ -3,9 +3,8 @@ import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-function App() {
+function App({ editingResource, setEditingResource }) {
   const navigate = useNavigate();
-  const [editingResource, setEditingResource] = useState(null);
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
