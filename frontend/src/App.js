@@ -98,13 +98,7 @@ function App() {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        resource_type: formData.resource_type,
-        url: formData.url,
-        tags: tagsArray.join(', ')
-      };
+      const payload = { ...formData, url: formData.url.trim(), tags: tagsArray.join(', ') };
       if (editingResource) {
         await axios.put(`http://127.0.0.1:8000/resources/${editingResource.id}`, payload);
         alert("Recurso atualizado com sucesso!");
@@ -112,16 +106,18 @@ function App() {
         await axios.post('http://127.0.0.1:8000/resources', payload);
         alert("Recurso salvo com sucesso!");
       }
-
       setEditingResource(null); 
       setView('list'); 
     } catch (error) {
-      console.error("Erro ao salvar:", error);
-      alert("Erro ao conectar com o servidor.");
+      if (error.response && (error.response.status === 400 || error.response.status === 409)) {
+          alert("Ops! Esta URL já está cadastrada no sistema.");
+      } else {
+          alert("Erro ao conectar com o servidor.");
+      }
     } finally {
       setLoading(false);
     }
-  };
+    };
   const updateTagsString = (newArray) => {
     setFormData({ ...formData, tags: newArray.join(', ') });
   };

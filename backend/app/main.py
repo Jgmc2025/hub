@@ -39,6 +39,12 @@ async def smart_assist(data: SmartAssistRequest):
 
 @app.post("/resources")
 def create_resource(data: dict, db: Session = Depends(get_db)):
+  existing = db.query(Resource).filter(Resource.url == data.get('url')).first()
+  if existing:
+    raise HTTPException(
+      status_code=400, 
+      detail="Esta URL já está cadastrada no sistema."
+    )
   new_resource = Resource(
     title=data['title'],
     description=data['description'],
@@ -81,6 +87,11 @@ def update_resource(resource_id: int, data: dict, db: Session = Depends(get_db))
   resource = db.query(Resource).filter(Resource.id == resource_id).first()
   if not resource:
     raise HTTPException(status_code=404, detail="Recurso não encontrado")
+  new_url = data.get('url')
+  if new_url and new_url != resource.url:
+    duplicate = db.query(Resource).filter(Resource.url == new_url).first()
+    if duplicate:
+      raise HTTPException(status_code=400, detail="Esta URL já pertence a outro recurso.")
   for key, value in data.items():
     setattr(resource, key, value)
   db.commit()
