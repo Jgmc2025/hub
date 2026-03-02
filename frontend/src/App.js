@@ -167,7 +167,7 @@ function App() {
     return <Home onStart={() => setView('create')} />;
   }
   if (view === 'list') {
-    return <Appointment onBack={() => setView('create')} />;
+    return <Appointment onNavigateToCreate={() => setView('create')} onBack={() => setView('home')} />;
   }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -181,9 +181,7 @@ function App() {
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
-        <button onClick={() => setView('list')} className="text-sm font-bold text-indigo-600">
-             Ver Repositório
-          </button>
+        <button onClick={() => setView('list')} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
       </nav>
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Recurso</h1>

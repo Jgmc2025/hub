@@ -8,8 +8,9 @@ import {
   Edit3
 } from 'lucide-react';
 import Home from './Home';
+import App from './App'
 
-const Appointment = () => {
+const Appointment = ({ onNavigateToCreate }) => {
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +59,9 @@ const Appointment = () => {
   if (view === 'home') {
     return <Home onStart={() => setView('list')} />;
   }
+  if (view === 'app') {
+    return <App onStart={() => setView('list')} />;
+  }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
@@ -70,6 +74,7 @@ const Appointment = () => {
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
+        <button onClick={onNavigateToCreate} className="text-sm font-bold text-indigo-600">Cadastrar Recurso</button>
       </nav>
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-white">
