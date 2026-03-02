@@ -12,6 +12,9 @@ import Home from './Home';
 import App from './App'
 
 const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchTitle, setSearchTitle] = useState('');
+  const [searchTags, setSearchTags] = useState('');
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +66,9 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
   };
   const filteredResources = resources.filter(res => {
     const matchesType = filterType === 'Todos' || res.resource_type === filterType;
-    return matchesType;
+    const matchesTitle = res.title.toLowerCase().includes(searchTitle.toLowerCase());
+    const matchesTags = res.tags ? res.tags.toLowerCase().includes(searchTags.toLowerCase()) : true;
+    return matchesType && matchesTitle && matchesTags;
   });
   const indexOfLastItem = currentPage * resourcesPerPage;
   const indexOfFirstItem = indexOfLastItem - resourcesPerPage;
@@ -76,6 +81,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
     }
   };
   const totalPages = Math.ceil(filteredResources.length / resourcesPerPage);
+  const hasActiveFilters = searchTitle !== '' || searchTags !== '' || filterType !== 'Todos';
   if (view === 'home') {
     return <Home onStart={() => setView('list')} />;
   }
@@ -107,20 +113,73 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                 </h1>
                 <p className="text-slate-500 text-sm mt-1 font-medium italic">Gerencie seus materiais didáticos.</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative min-w-[160px]">
-                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                  <select 
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-600 appearance-none cursor-pointer"
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                  >
-                    <option value="Todos">Todos os Tipos</option>
-                    <option value="Vídeo">Vídeos</option>
-                    <option value="PDF">PDFs</option>
-                    <option value="Link">Links</option>
-                  </select>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-3 relative">
+                <button 
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all text-sm font-bold shadow-sm ${
+                    isFilterOpen || filterType !== 'Todos' || searchTitle || searchTags
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-600' 
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <Filter size={16} />
+                  Filtros
+                  {(filterType !== 'Todos' || searchTitle || searchTags) && (
+                    <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
+                  )}
+                </button>
+
+                {isFilterOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in zoom-in duration-200">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Título</label>
+                        <input 
+                          type="text"
+                          placeholder="Ex: Aula de React..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                          value={searchTitle}
+                          onChange={(e) => setSearchTitle(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Tipo</label>
+                        <select 
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                          value={filterType}
+                          onChange={(e) => setFilterType(e.target.value)}
+                        >
+                          <option value="Todos">Todos os Tipos</option>
+                          <option value="Vídeo">Vídeos</option>
+                          <option value="PDF">PDFs</option>
+                          <option value="Link">Links</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Tags</label>
+                        <input 
+                          type="text"
+                          placeholder="Ex: Frontend, IA..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                          value={searchTags}
+                          onChange={(e) => setSearchTags(e.target.value)}
+                        />
+                      </div>
+                      {hasActiveFilters && (
+                        <button 
+                          onClick={() => {
+                            setSearchTitle('');
+                            setSearchTags('');
+                            setFilterType('Todos');
+                          }}
+                          className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          Limpar Filtros
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
