@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus } from 'lucide-react';
+import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash2 } from 'lucide-react';
 import Home from './Home';
 import Appointment from './Appointment';
 
@@ -213,6 +213,7 @@ function App() {
             </label>
             <input 
               type="text"
+              maxLength={50}
               className={`block w-full border rounded-md p-2 outline-none transition-all ${titleError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: capitalizeFirst(e.target.value)})}
@@ -263,6 +264,7 @@ function App() {
             <div className={`relative border rounded-md bg-white transition-all ${descError ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-gray-300 focus-within:ring-2 focus-within:ring-indigo-500'}`}>
               <textarea 
                 rows="4"
+                maxLength={1000}
                 className="block w-full border-none bg-transparent py-2 px-3 pr-10 resize-none outline-none overflow-y-auto leading-relaxed text-black"
                 style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)' }}
                 value={formData.description}
@@ -273,6 +275,7 @@ function App() {
             {descError && <p className="text-red-500 text-xs mt-1">Mínimo de 20 dígitos.</p>}
           </div>
           <div>
+            <div className="flex items-center justify-between w-full h-6 mb-2">
             <div className="flex items-center gap-2 h-6 mb-2">
               <label className="text-sm font-semibold text-gray-700 flex items-center leading-none">Tags
               <HelpButton id="tags" text="Palavras-chave que ajudam a organizar seu conteúdo. Ex: 'React', 'Frontend', 'Iniciante'." />
@@ -283,6 +286,20 @@ function App() {
                   IA escrevendo tags...
                 </span>
               )}
+              </div>
+              {tagsArray.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (window.confirm("Remover todas as tags?")) {
+                      setFormData({ ...formData, tags: '' });
+                    }
+                  }}
+                  className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-md hover:bg-red-50"
+                  title="Limpar todas as tags"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
             <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px] items-center">
               {tagsArray.map((tag, index) => (
@@ -292,7 +309,7 @@ function App() {
                       autoFocus
                       className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
                       value={editValue}
-                      onChange={(e) => setEditValue(capitalizeFirst(e.target.value))}
+                      onChange={(e) => setEditValue(capitalizeFirst(e.target.value.replace(/\s/g, '')))}
                       onBlur={() => saveTagEdit(index)}
                       onKeyDown={(e) => e.key === 'Enter' && saveTagEdit(index)}
                     />
@@ -314,16 +331,24 @@ function App() {
               {isAdding ? (
                 <input 
                   autoFocus
+                  maxLength={30}
                   placeholder="Nome da tag..."
                   className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
-                  onChange={(e) => setNewTagValue(capitalizeFirst(e.target.value))}
+                  value={newTagValue}
+                  onChange={(e) => {
+                    const filteredValue = capitalizeFirst(e.target.value.replace(/\s/g, ''));
+                    setNewTagValue(filteredValue);
+                  }}
                   onBlur={addNewTag}
                   onKeyDown={(e) => e.key === 'Enter' && addNewTag()}
                 />
               ) : (
+                tagsArray.length <= 10 &&
                 <button 
-                  onClick={() => setIsAdding(true)}
-                  className="flex items-center gap-1 bg-white text-gray-400 text-xs font-bold px-3 py-1.5 rounded-md border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-all shadow-sm"
+                  onClick={() => {
+                    setIsAdding(true);
+                  }}
+                  className='flex items-center gap-1 bg-white text-xs font-bold px-3 py-1.5 rounded-md border border-dashed transition-all shadow-sm border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500'
                 >
                   <Plus size={14} />
                   Nova Tag

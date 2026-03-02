@@ -10,67 +10,79 @@ from app.services.ai_service import generate_educational_metadata
 init_db()
 app = FastAPI(title="Hub de Recursos Educacionais")
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
 )
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
 
 @app.post("/smart-assist", response_model=SmartAssistResponse)
 async def smart_assist(data: SmartAssistRequest):
-    start_time = time.time()
-    try:
-        result = generate_educational_metadata(data.title, data.resource_type)
-        latency = time.time() - start_time
-        logger.info(f"[INFO] AI Request: Title='{data.title}', Latency={latency:.2f}s")
-        return result
-    except Exception as e:
-        logger.error(f"[ERROR] Falha na IA: {str(e)}")
-        raise HTTPException(status_code=500, detail="Erro ao processar sugestão da IA.")
+  start_time = time.time()
+  try:
+    result = generate_educational_metadata(data.title, data.resource_type)
+    latency = time.time() - start_time
+    logger.info(f"[INFO] AI Request: Title='{data.title}', Latency={latency:.2f}s")
+    return result
+  except Exception as e:
+    logger.error(f"[ERROR] Falha na IA: {str(e)}")
+    raise HTTPException(status_code=500, detail="Erro ao processar sugestão da IA.")
 
 @app.post("/resources")
 def create_resource(data: dict, db: Session = Depends(get_db)):
-    new_resource = Resource(
-        title=data['title'],
-        description=data['description'],
-        resource_type=data['resource_type'],
-        tags=data['tags'],
-        url=data.get('url')
-    )
-    db.add(new_resource)
-    db.commit()
-    db.refresh(new_resource)
-    return new_resource
+  new_resource = Resource(
+    title=data['title'],
+    description=data['description'],
+    resource_type=data['resource_type'],
+    tags=data['tags'],
+    url=data.get('url')
+  )
+  db.add(new_resource)
+  db.commit()
+  db.refresh(new_resource)
+  return new_resource
 
 @app.get("/resources")
 def list_resources(db: Session = Depends(get_db)):
-    return db.query(Resource).all()
+  return db.query(Resource).all()
+
+@app.delete("/resources/all")
+def delete_all_resources(db: Session = Depends(get_db)):
+  try:
+    num_deleted = db.query(Resource).delete()
+    db.commit()
+    logger.info(f"[INFO] Exclusão em massa: {num_deleted} recursos removidos.")
+    return {"message": f"{num_deleted} recursos removidos com sucesso"}
+  except Exception as e:
+    db.rollback()
+    logger.error(f"[ERROR] Falha ao excluir todos: {str(e)}")
+    raise HTTPException(status_code=500, detail="Erro ao limpar o banco de dados")
 
 @app.delete("/resources/{resource_id}")
 def delete_resource(resource_id: int, db: Session = Depends(get_db)):
-    resource = db.query(Resource).filter(Resource.id == resource_id).first()
-    if not resource:
-        raise HTTPException(status_code=404, detail="Recurso não encontrado")
-    db.delete(resource)
-    db.commit()
-    return {"message": "Recurso removido com sucesso"}
+  resource = db.query(Resource).filter(Resource.id == resource_id).first()
+  if not resource:
+    raise HTTPException(status_code=404, detail="Recurso não encontrado")
+  db.delete(resource)
+  db.commit()
+  return {"message": "Recurso removido com sucesso"}
 
 @app.put("/resources/{resource_id}")
 def update_resource(resource_id: int, data: dict, db: Session = Depends(get_db)):
-    resource = db.query(Resource).filter(Resource.id == resource_id).first()
-    if not resource:
-        raise HTTPException(status_code=404, detail="Recurso não encontrado")
-    for key, value in data.items():
-        setattr(resource, key, value)
-    db.commit()
-    db.refresh(resource)
-    return resource
+  resource = db.query(Resource).filter(Resource.id == resource_id).first()
+  if not resource:
+    raise HTTPException(status_code=404, detail="Recurso não encontrado")
+  for key, value in data.items():
+    setattr(resource, key, value)
+  db.commit()
+  db.refresh(resource)
+  return resource

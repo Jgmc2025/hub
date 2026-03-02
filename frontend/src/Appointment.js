@@ -41,6 +41,26 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
       }
     }
   };
+  const deleteAllResources = async () => {
+    if (resources.length === 0) return;
+    const confirmFirst = window.confirm(
+      "Você está prestes a excluir todos os recursos do repositório. Esta ação não pode ser desfeita. Deseja continuar?"
+    );
+    if (confirmFirst) {
+      try {
+        setLoading(true);
+        await axios.delete('http://127.0.0.1:8000/resources/all');
+        setResources([]); 
+        alert("Repositório limpo com sucesso.");
+      } catch (error) {
+        console.error("Erro ao excluir todos:", error);
+        alert("Erro ao conectar com o servidor para excluir tudo.");
+      } finally {
+        setLoading(false);
+        fetchResources(); 
+      }
+    }
+  };
   const filteredResources = resources.filter(res => {
     const matchesType = filterType === 'Todos' || res.resource_type === filterType;
     return matchesType;
@@ -110,7 +130,19 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Editar</th>
                   <th className="px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-left">Recurso</th>
-                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Excluir</th>
+                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">
+                    <div className="flex items-center justify-center gap-2">Excluir
+                      {resources.length > 0 && (
+                        <button 
+                          onClick={deleteAllResources}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all group/all"
+                          title="Excluir tudo"
+                        >
+                          <Trash2 size={14} className="group-hover/all:scale-110 transition-transform" />
+                        </button>
+                      )}
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -126,7 +158,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                         className="inline-flex items-center justify-center p-2.5 text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm"
                         title="Editar recurso"
                       >
-                        <Edit3 size={20} strokeWidth={2} />
+                        <Edit3 size={18} strokeWidth={2} />
                       </button>
                     </td>
                     <td className="px-6 py-6 text-left">
@@ -170,7 +202,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                         className="inline-flex items-center justify-center p-2.5 text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90 shadow-sm"
                         title="Excluir recurso"
                       >
-                        <Trash2 size={20} strokeWidth={2} />
+                        <Trash2 size={18} strokeWidth={2} />
                       </button>
                     </td>
                   </tr>
