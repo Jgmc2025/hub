@@ -57,6 +57,10 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
       default: return <LinkIcon size={16} className="text-emerald-500" />;
     }
   };
+  const totalPages = Math.ceil(filteredResources.length / resourcesPerPage);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType]);
   if (view === 'home') {
     return <Home onStart={() => setView('list')} />;
   }
@@ -88,47 +92,38 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                 </h1>
                 <p className="text-slate-500 text-sm mt-1 font-medium italic">Gerencie seus materiais didáticos.</p>
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1 group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
-                <input 
-                  type="text" 
-                  placeholder="Filtrar por título..." 
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="relative min-w-[160px]">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <select 
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-600 appearance-none cursor-pointer"
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                >
-                  <option value="Todos">Todos os Tipos</option>
-                  <option value="Vídeo">Vídeos</option>
-                  <option value="PDF">PDFs</option>
-                  <option value="Link">Links</option>
-                </select>
-              </div>
+              {filteredResources.length > 0 &&
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative min-w-[160px]">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <select 
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-bold text-slate-600 appearance-none cursor-pointer"
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value)}
+                  >
+                    <option value="Todos">Todos os Tipos</option>
+                    <option value="Vídeo">Vídeos</option>
+                    <option value="PDF">PDFs</option>
+                    <option value="Link">Links</option>
+                  </select>
+                </div>
+              </div>}
             </div>
           </div>
           <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-inner">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Editar</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left">Recurso</th>
-                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Excluir</th>
+                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Editar</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-left">Recurso</th>
+                  <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Excluir</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr><td colSpan="3" className="p-10 text-center text-slate-400 font-medium italic animate-pulse">Carregando dados...</td></tr>
                 ) : currentItems.length === 0 ? (
-                  <tr><td colSpan="3" className="p-10 text-center text-slate-400 font-medium italic">Nenhum recurso encontrado no banco.</td></tr>
+                  <tr><td colSpan="3" className="p-10 text-center text-slate-400 font-medium italic">Nenhum recurso encontrado.</td></tr>
                 ) : currentItems.map((res) => (
                   <tr key={res.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="px-6 py-6 text-center">
@@ -189,24 +184,32 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
               </tbody>
             </table>
             {filteredResources.length > 0 &&
-            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-tight"> 
-                {filteredResources.length} {filteredResources.length === 1 ? 'Material' : 'Materiais'}
+            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-400 tracking-tight"> 
+            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+              {filteredResources.length} {filteredResources.length === 1 ? 'Material' : 'Materiais'}
+            </span>
+              {filteredResources.length > 5 &&
+              <div className="flex items-center gap-4">
+                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+                  Página {currentPage} de {totalPages || 1}
+                </span>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(p => p - 1)}
-                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95"
                   >
                     <ChevronLeft size={18} />
                   </button>
-                  <button 
-                    disabled={indexOfLastItem >= filteredResources.length}
-                    onClick={() => setCurrentPage(p => p + 1)}
-                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                  <button
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95"
                   >
                     <ChevronRight size={18} />
                   </button>
                 </div>
+              </div>}
             </div>}
           </div>
         </div>
