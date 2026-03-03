@@ -226,7 +226,7 @@ const Appointment = ({ onEdit }) => {
             </div>
           </div>
           <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-inner">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse table-fixed">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Editar</th>
