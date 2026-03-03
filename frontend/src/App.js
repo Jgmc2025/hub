@@ -401,7 +401,7 @@ function App({ editingResource, setEditingResource }) {
               }`}
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-            Salvar
+            {loading ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
       </div>
