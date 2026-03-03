@@ -1,11 +1,10 @@
 import os
 import json
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = Groq(api_key=os.getenv("API_KEY"))
-
+client = OpenAI( api_key=os.getenv("API_KEY"), base_url=os.getenv("BASE_URL"))
 def generate_educational_metadata(title: str, resource_type: str):
   prompt = f"""
   Você é um Assistente Pedagógico.
@@ -27,7 +26,7 @@ def generate_educational_metadata(title: str, resource_type: str):
   """
   try:
     completion = client.chat.completions.create(
-      model="llama-3.3-70b-versatile", 
+      model=os.getenv("AI_MODEL"), 
       messages=[
         {"role": "system", "content": "Você é um assistente que responde apenas em JSON."},
         {"role": "user", "content": prompt}
@@ -36,7 +35,7 @@ def generate_educational_metadata(title: str, resource_type: str):
     )
     return json.loads(completion.choices[0].message.content)
   except Exception as e:
-    print(f"Erro no Groq: {e}")
+    print(f"Erro no preenchimento pela IA: {e}")
     return {
       "description": f"Recurso sobre {title}. Por favor, edite esta descrição.",
       "tags": ["Educação", resource_type, "Geral"]

@@ -229,4 +229,4 @@ build/
 *.log
 
 # banco de dados
-hub_educacional.db
+hub.db
