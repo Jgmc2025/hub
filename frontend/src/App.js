@@ -4,6 +4,8 @@ import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash
 import { useNavigate } from 'react-router-dom';
 
 function App({ editingResource, setEditingResource }) {
+  const [urlExists, setUrlExists] = useState(false);
+  const [checkingUrl, setCheckingUrl] = useState(false);
   const navigate = useNavigate();
   const capitalizeFirst = (str) => {
     if (!str) return "";
@@ -22,6 +24,35 @@ function App({ editingResource, setEditingResource }) {
     tags: '',
     url: ''
   });
+  const isUrlValid = (url) => {
+    try { new URL(url); return true; } catch { return false; }
+  };
+  useEffect(() => {
+    const verifyUrl = async () => {
+      const currentUrl = formData.url.trim().toLowerCase();
+      if (!currentUrl || !isUrlValid(formData.url)) {
+        setUrlExists(false);
+        return;
+      }
+      if (editingResource && currentUrl === editingResource.url.trim().toLowerCase()) {
+        setUrlExists(false);
+        return;
+      }
+      setCheckingUrl(true);
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/resources');
+        const exists = response.data.some(res => 
+          res.url.trim().toLowerCase() === currentUrl
+        );
+        setUrlExists(exists);
+      } catch (error) {
+        console.error("Erro ao validar URL:", error);
+      } finally {
+        setCheckingUrl(false);
+      }
+    };
+    verifyUrl()
+  }, [formData.url, editingResource]);
   useEffect(() => {
     if (editingResource) {
       setFormData({
@@ -154,22 +185,21 @@ function App({ editingResource, setEditingResource }) {
   };
   const titleError = formData.title.length > 0 && formData.title.trim().length < 3;
   const descError = formData.description.length > 0 && formData.description.trim().length < 20;
-  const isUrlValid = (url) => {
-    try { new URL(url); return true; } catch { return false; }
-  };
   const urlError = formData.url.length > 0 && !isUrlValid(formData.url);
   const isFormValid = () => {
     const isTitleValid = formData.title.trim().length >= 3;
     const isDescriptionValid = formData.description.trim().length >= 20;
     const isTagsValid = tagsArray.length > 0;
-    let isUrlValid = false;
-    try {
-      new URL(formData.url);
-      isUrlValid = true;
-    } catch (e) {
-      isUrlValid = false;
-    }
-    return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
+    const isUrlFormatOk = isUrlValid(formData.url);
+    return (
+      isTitleValid && 
+      isDescriptionValid && 
+      isTagsValid && 
+      isUrlFormatOk && 
+      !urlExists && 
+      !checkingUrl &&
+      !loading
+    );
   };
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -340,16 +370,26 @@ function App({ editingResource, setEditingResource }) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">URL
-            <HelpButton id="url" text="Insira o link completo começando com http:// ou https:// para que o recurso possa ser acessado." />
+              <HelpButton id="url" text="Insira o link completo começando com http:// ou https://." />
             </label>
+          <div className="relative">
             <input 
               type="url"
-              className={`block w-full border rounded-md p-2 outline-none transition-all ${urlError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
+              className={`block w-full border rounded-md p-2 outline-none transition-all ${
+                (urlError || urlExists) ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
+              }`}
               value={formData.url}
               onChange={(e) => setFormData({...formData, url: e.target.value})}
               placeholder='https://youtube.com/...'
             />
+            {checkingUrl && (
+              <div className="absolute right-3 top-2.5">
+                <Loader2 className="animate-spin text-indigo-400" size={18} />
+              </div>
+            )}
+          </div>
             {urlError && <p className="text-red-500 text-xs mt-1">Insira uma URL válida.</p>}
+            {urlExists && <p className="text-red-500 text-xs mt-1">Esta URL já está cadastrada.</p>}
           </div>
           <button 
             onClick={handleSave}
