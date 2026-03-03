@@ -12,6 +12,7 @@ def generate_educational_metadata(title: str, resource_type: str):
   gere uma descrição educativa e 3 tags relevantes.
 
   1. DESCRIPTION: Uma descrição pedagógica clara. 
+    - LIMITE MÍNIMO: 80 caracteres (contando espaços).
     - LIMITE MÁXIMO: 800 caracteres (contando espaços).
   
   2. TAGS: Uma lista de palavras-chave.
@@ -33,10 +34,13 @@ def generate_educational_metadata(title: str, resource_type: str):
       ],
       response_format={"type": "json_object"}
     )
-    return json.loads(completion.choices[0].message.content)
+    content = json.loads(completion.choices[0].message.content)
+    usage = completion.usage.total_tokens 
+    return content, usage
   except Exception as e:
     print(f"Erro no preenchimento pela IA: {e}")
-    return {
-      "description": f"Recurso sobre {title}. Por favor, edite esta descrição.",
+    fallback_content = {
+      "description": f"Recurso educativo sobre {title}. Conteúdo selecionado para apoio pedagógico e estudo.",
       "tags": ["Educação", resource_type, "Geral"]
     }
+    return fallback_content, 0

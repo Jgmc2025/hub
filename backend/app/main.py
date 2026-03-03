@@ -29,9 +29,9 @@ def get_db():
 async def smart_assist(data: SmartAssistRequest):
   start_time = time.time()
   try:
-    result = generate_educational_metadata(data.title, data.resource_type)
+    result, tokens = generate_educational_metadata(data.title, data.resource_type)
     latency = time.time() - start_time
-    logger.info(f"[INFO] AI Request: Title='{data.title}', Latency={latency:.2f}s")
+    logger.info(f'[INFO] Request da IA: Title="{data.title}", TokenUsage={tokens}, Latency={latency:.2f}s')
     return result
   except Exception as e:
     logger.error(f"[ERROR] Falha na IA: {str(e)}")
@@ -97,3 +97,7 @@ def update_resource(resource_id: int, data: dict, db: Session = Depends(get_db))
   db.commit()
   db.refresh(resource)
   return resource
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "timestamp": time.time()}
