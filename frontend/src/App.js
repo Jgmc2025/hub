@@ -103,7 +103,7 @@ function App({ editingResource, setEditingResource }) {
       });
     } catch (error) {
       console.error("Erro na IA:", error);
-      toast.error("O Serviço de Assistência por IA está indisponível no momento.");
+      toast.error("O Serviço de IA está indisponível.");
     } finally {
       setLoading(false);
     }
@@ -112,14 +112,14 @@ function App({ editingResource, setEditingResource }) {
     const titleClean = formData.title.trim();
     const urlClean = formData.url.trim();
     if (titleClean.length < 3) {
-      toast.error("Por favor, insira um título mais descritivo.");
+      toast.error("Insira um título mais descritivo.");
       return false;
     }
     try {
       if (!urlClean) throw new Error();
       new URL(urlClean);
     } catch (error) {
-      toast.error("Por favor, insira um endereço de URL válido.");
+      toast.error("Insira um endereço de URL válido.");
       return false;
     }
     return true;
@@ -140,7 +140,7 @@ function App({ editingResource, setEditingResource }) {
       navigate('/list');
     } catch (error) {
       if (error.response && (error.response.status === 400 || error.response.status === 409)) {
-          toast.error("Esta URL já está cadastrada no sistema.");
+          toast.error("Esta URL já está cadastrada.");
       } else {
           toast.error("Erro ao conectar com o servidor.");
       }
