@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 function App({ editingResource, setEditingResource }) {
   const [urlExists, setUrlExists] = useState(false);
@@ -86,7 +87,7 @@ function App({ editingResource, setEditingResource }) {
   const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
   const handleSmartAssist = async () => {
     if (!formData.title) {
-      alert("Digite um título primeiro!");
+      toast.error("Digite um título primeiro.");
       return;
     }
     setLoading(true);
@@ -102,7 +103,7 @@ function App({ editingResource, setEditingResource }) {
       });
     } catch (error) {
       console.error("Erro na IA:", error);
-      alert("O Serviço de Assistência por IA está indisponível no momento. Por favor, tente mais tarde.");
+      toast.error("O Serviço de Assistência por IA está indisponível no momento.");
     } finally {
       setLoading(false);
     }
@@ -111,14 +112,14 @@ function App({ editingResource, setEditingResource }) {
     const titleClean = formData.title.trim();
     const urlClean = formData.url.trim();
     if (titleClean.length < 3) {
-      alert("Por favor, insira um título mais descritivo.");
+      toast.error("Por favor, insira um título mais descritivo.");
       return false;
     }
     try {
       if (!urlClean) throw new Error();
       new URL(urlClean);
     } catch (error) {
-      alert("Por favor, insira um endereço de URL válido.");
+      toast.error("Por favor, insira um endereço de URL válido.");
       return false;
     }
     return true;
@@ -130,18 +131,18 @@ function App({ editingResource, setEditingResource }) {
       const payload = { ...formData, url: formData.url.trim(), tags: tagsArray.join(', ') };
       if (editingResource) {
         await axios.put(`http://127.0.0.1:8000/resources/${editingResource.id}`, payload);
-        alert("Recurso atualizado com sucesso!");
+        toast.success("Recurso atualizado com sucesso!");
       } else {
         await axios.post('http://127.0.0.1:8000/resources', payload);
-        alert("Recurso salvo com sucesso!");
+        toast.success("Recurso salvo com sucesso!");
       }
       setEditingResource(null); 
       navigate('/list');
     } catch (error) {
       if (error.response && (error.response.status === 400 || error.response.status === 409)) {
-          alert("Ops! Esta URL já está cadastrada no sistema.");
+          toast.error("Esta URL já está cadastrada no sistema.");
       } else {
-          alert("Erro ao conectar com o servidor.");
+          toast.error("Erro ao conectar com o servidor.");
       }
     } finally {
       setLoading(false);
@@ -161,7 +162,7 @@ function App({ editingResource, setEditingResource }) {
     }
     const isDuplicate = tagsArray.some((tag, i) => i !== index && tag.toLowerCase() === cleanEdit);
     if (isDuplicate) {
-      alert(`A tag "${cleanEdit}" já existe nesta lista.`);
+      toast.error(`Essa tag já existe nesta lista.`);
       setEditingIndex(null); 
       return;
     }
@@ -175,7 +176,7 @@ function App({ editingResource, setEditingResource }) {
     if (cleanTag) {
       const tagExists = tagsArray.some(t => t.toLowerCase() === cleanTag.toLowerCase());
       if (tagExists) {
-        alert("Esta tag já existe.");
+        toast.error("Esta tag já existe nesta lista.");
       } else {
         updateTagsString([...tagsArray, cleanTag]);
       }
@@ -203,11 +204,12 @@ function App({ editingResource, setEditingResource }) {
   };
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
+      <Toaster position="top-center"/>
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
-          title="Voltar para a Home"
+          title="Ir para menu"
           onClick={() => navigate('/')}
         >
           <Zap fill="currentColor" size={24} />

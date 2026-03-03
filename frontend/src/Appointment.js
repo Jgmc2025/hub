@@ -10,6 +10,7 @@ import {
   X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Appointment = ({ onEdit }) => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const Appointment = ({ onEdit }) => {
         await axios.delete(`http://127.0.0.1:8000/resources/${id}`);
         fetchResources(); 
       } catch (error) {
-        alert("Erro ao excluir recurso.");
+        toast.error("Erro ao excluir recurso.");
       }
     }
   };
@@ -59,10 +60,10 @@ const Appointment = ({ onEdit }) => {
         setLoading(true);
         await axios.delete('http://127.0.0.1:8000/resources/all');
         setResources([]); 
-        alert("Repositório limpo com sucesso.");
+        toast.success("Repositório limpo com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir todos:", error);
-        alert("Erro ao conectar com o servidor para excluir tudo.");
+        toast.error("Erro ao conectar com o servidor para excluir tudo.");
       } finally {
         setLoading(false);
         fetchResources(); 
@@ -89,12 +90,13 @@ const Appointment = ({ onEdit }) => {
   const hasActiveFilters = searchTitle !== '' || searchTags !== '' || filterType !== 'Todos';
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
+      <Toaster position="top-center"/>
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
           onClick={() => navigate('/')}
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
-          title="Voltar para a Home"
+          title="Ir para menu"
         >
           <Zap fill="currentColor" size={24} />
           HUB EDU
