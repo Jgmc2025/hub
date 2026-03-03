@@ -1,6 +1,6 @@
 # 🚀 Hub Inteligente de Recursos Educacionais
 
-Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o **Smart Assist**, um assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.
+Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o Assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -9,11 +9,11 @@ Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimiz
 - **Framework:** FastAPI (RESTful API)
 - **Validação:** Pydantic
 - **ORM:** SQLAlchemy
-- **Banco de Dados:** SQLite (persistência local)
-- **IA:** Integração com LLM via Groq/OpenAI SDK
+- **Banco de Dados:** SQLite 
+- **IA:** Integração com LLM via Groq
 
 ### Frontend
-- **Framework:** React.js (SPA)
+- **Framework:** React.js 
 - **Estilização:** Tailwind CSS
 - **Estado:** React Hooks e gerenciamento de *loading states* para IA
 
@@ -43,11 +43,11 @@ Exemplo de log estruturado gerado (conforme requisito):
 ### Pré-requisitos
 - Python 3.10+
 - Node.js 18+
-- Uma API Key (Groq, Gemini ou OpenAI)
+- Uma API Key do Groq
 
-### Configuração do Backend
-1. Navegue até a pasta: `cd backend`.
-2. Crie e ative um ambiente virtual:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # Windows: .\venv\Scripts\activate
+### Clonar projeto do GitHub
+1. No terminal, procure um local para adicionar o projeto
+2. Digite *git clone https://github.com/Jgmc2025/hub.git* 
+3. Entre no arquivo: *cd hub*
+4. Execute *npm run setup* para instalar todas as dependências
+5. Rode o projeto: *npm run dev*. Você será redirecionado para a página do projeto (localhost:3000)
