@@ -24,12 +24,12 @@ Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimiz
 
 ## ✨ Funcionalidades
 
-- [x] **CRUD de Recursos:** Cadastro, listagem com paginação, edição e exclusão de materiais.
-- [x] **Campos Suportados:** Título, Descrição, Tipo (Vídeo, PDF, Link), URL e Tags.
-- [x] **Smart Assist (IA):** Botão para geração automática de metadados pedagógicos.
-- [x] **Observabilidade:** Logs técnicos detalhados para cada requisição de IA.
-- [x] **Resiliência:** Tratamento de erros e mecanismo de *fallback* caso a API de IA falhe.
-- [x] **Segurança:** Gestão de API Keys via variáveis de ambiente (.env).
+- [x] **CRUD de Recursos:** Cadastro, listagem com paginação, edição e exclusão de materiais
+- [x] **Campos Suportados:** Título, Descrição, Tipo (Vídeo, PDF, Link), URL e Tags
+- [x] **Smart Assist (IA):** Botão para geração automática de metadados pedagógicos
+- [x] **Observabilidade:** Logs técnicos detalhados para cada requisição de IA
+- [x] **Resiliência:** Tratamento de erros e mecanismo de *fallback* caso a API de IA falhe
+- [x] **Segurança:** Gestão de API Keys via variáveis de ambiente (.env)
 
 ## 🏗️ Arquitetura e IA (Prompt Engineering)
 
@@ -47,7 +47,8 @@ Exemplo de log estruturado gerado (conforme requisito):
 
 ### Clonar projeto do GitHub
 1. No terminal, procure um local para adicionar o projeto
-2. Digite *git clone https://github.com/Jgmc2025/hub.git* 
-3. Entre no arquivo: *cd hub*
-4. Execute *npm run setup* para instalar todas as dependências
-5. Rode o projeto: *npm run dev*. Você será redirecionado para a página do projeto (localhost:3000)
+2. Digite **git clone https://github.com/Jgmc2025/hub.git**
+3. Entre no arquivo: **cd hub**
+4. Execute **npm run setup** para instalar todas as dependências
+5. Adicione sua chave API do Groq na variável API_KEY dentro do arquivo .env no backend
+6. Rode o projeto: **npm run dev**. Você será redirecionado para a página localhost:3000

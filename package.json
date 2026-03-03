@@ -4,11 +4,11 @@
   "description": "Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o **Smart Assist**, um assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.",
   "main": "index.js",
   "scripts": {
-    "server": "cd backend && ./venv/bin/uvicorn app.main:app --reload",
+    "server": "cd backend && ./venv/bin/uvicorn app.main:app --reload && cp -n .env.example .env || true",
     "client": "cd frontend && npm run start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "node": "npm install && cd frontend && npm install",
-    "env": "cd backend && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt && cp -n .env.example .env || true",
+    "env": "cd backend && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt",
     "setup": "npm run env && npm run node"
   },
   "repository": {
