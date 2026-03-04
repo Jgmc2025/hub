@@ -16,6 +16,7 @@ def generate_educational_metadata(title: str, resource_type: str):
     - LIMITE MÁXIMO: 800 caracteres (contando espaços).
   
   2. TAGS: Uma lista de palavras-chave.
+    - REGRA DE OURO: Use a ortografia correta da língua portuguesa, INCLUINDO ACENTOS e CEDILHAS (ex: "Educação" em vez de "Educacao").
     - REGRA DE OURO: Cada tag deve ser uma ÚNICA PALAVRA (sem espaços).
     - LIMITE MÁXIMO: Cada tag deve ter no máximo 25 caracteres.
   

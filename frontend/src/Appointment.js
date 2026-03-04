@@ -22,7 +22,7 @@ const Appointment = ({ onEdit }) => {
   const closeDetails = () => setSelectedResource(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTitle, setSearchTitle] = useState('');
-  const [searchTags, setSearchTags] = useState('');
+  const [searchTags, setSearchTags] = useState([]);
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +111,9 @@ const Appointment = ({ onEdit }) => {
   const filteredResources = resources.filter(res => {
     const matchesType = filterType === 'Todos' || res.resource_type === filterType;
     const matchesTitle = res.title.toLowerCase().includes(searchTitle.toLowerCase());
-    const matchesTags = res.tags ? res.tags.toLowerCase().includes(searchTags.toLowerCase()) : true;
+    const resTagsArray = res.tags ? res.tags.toLowerCase().split(',').map(t => t.trim()) : [];
+    const matchesTags = searchTags.length === 0 || 
+      searchTags.every(tag => resTagsArray.includes(tag.toLowerCase()));
     return matchesType && matchesTitle && matchesTags;
   });
   const indexOfLastItem = currentPage * resourcesPerPage;
@@ -124,8 +126,22 @@ const Appointment = ({ onEdit }) => {
       default: return <LinkIcon size={16} className="text-emerald-500" />;
     }
   };
+  const allAvailableTags = [...new Set(
+    resources
+      .map(res => res.tags ? res.tags.split(',') : [])
+      .flat()
+      .map(tag => tag.trim())
+      .filter(tag => tag !== "")
+  )];
+  const toggleTag = (tag) => {
+    setSearchTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag]             
+    );
+  };
   const totalPages = Math.ceil(filteredResources.length / resourcesPerPage);
-  const hasActiveFilters = searchTitle !== '' || searchTags !== '' || filterType !== 'Todos';
+  const hasActiveFilters = searchTitle !== '' || searchTags.length > 0 || filterType !== 'Todos';
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
       <Toaster position="top-center"/>
@@ -163,13 +179,13 @@ const Appointment = ({ onEdit }) => {
                 >
                   <Filter size={16} />
                   Filtros
-                  {(filterType !== 'Todos' || searchTitle || searchTags) && (
+                  {(filterType !== 'Todos' || searchTitle || searchTags.length > 0) && (
                     <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
                   )}
                 </button>
 
                 {isFilterOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in zoom-in duration-200">
+                  <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50 animate-in fade-in zoom-in duration-200">
                     <div className="space-y-4">
                       <div>
                         <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Título</label>
@@ -196,22 +212,44 @@ const Appointment = ({ onEdit }) => {
                       </div>
                       <div>
                         <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Tags</label>
-                        <input 
-                          type="text"
-                          placeholder="Ex: Frontend,IA..."
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
-                          value={searchTags}
-                          onChange={(e) => {
-                            const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
-                            setSearchTags(capitalizeFirst(valueWithoutSpaces));
-                          }}
-                        />
+                        <div className="w-full max-h-40 overflow-y-auto border border-slate-100 bg-slate-50/30 rounded-lg p-3 custom-scrollbar">
+                          <div className="flex flex-wrap gap-x-2 gap-y-3">
+                            <button
+                              onClick={() => setSearchTags([])}
+                              className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-bold tracking-wider border transition-all ${
+                                searchTags.length === 0 
+                                ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' 
+                                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
+                              }`}
+                            >
+                              Todas
+                            </button>
+                            {allAvailableTags.map((tag) => {
+                              const isSelected = searchTags.includes(tag);
+                              return (
+                                <button
+                                  key={tag}
+                                  onClick={() => toggleTag(tag)}
+                                  className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded font-bold tracking-wider border transition-all active:scale-95 ${
+                                    isSelected 
+                                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' 
+                                    : 'bg-indigo-50 border-indigo-100/50 text-indigo-500 hover:border-indigo-300'
+                                  }`}
+                                >
+                                  <Tag size={10} className={isSelected ? 'text-white' : 'text-indigo-400'} />
+                                  {tag}
+                                  {isSelected && <X size={10} className="ml-1 opacity-70" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                       {hasActiveFilters && (
                         <button 
                           onClick={() => {
                             setSearchTitle('');
-                            setSearchTags('');
+                            setSearchTags([]);
                             setFilterType('Todos');
                           }}
                           className="w-full py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-md transition-colors"
