@@ -4,13 +4,13 @@
   "description": "Aplicação Fullstack com Smart Assist (IA) para gerenciamento de materiais didáticos.",
   "main": "index.js",
   "scripts": {
-    "server": "cd backend && python -m uvicorn app.main:app --reload",
+    "server": "cd backend && (python3 -m uvicorn app.main:app --reload || python -m uvicorn app.main:app --reload)",
     "client": "cd frontend && npm run start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "node": "npm install && cd frontend && npm install",
-    "env": "cd backend && python -m venv venv && python -m pip install -r requirements.txt && shx cp -n .env.example .env",
-    "setup": "npm run env && npm run node",
-    "lint": "cd backend && python -m flake8 ."
+    "env": "cd backend && (python3 -m venv venv || python -m venv venv) && (./venv/bin/python -m pip install -r requirements.txt || ./venv/Scripts/python -m pip install -r requirements.txt) && (npx shx cp -n .env.example .env || npx shx touch .env)",
+    "setup": "npm install && npm run node && npm run env",
+    "lint": "cd backend && (python3 -m flake8 . || python -m flake8 .)"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

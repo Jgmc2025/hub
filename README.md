@@ -1,6 +1,8 @@
 # 🚀 Hub Inteligente de Recursos Educacionais
-
 Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o Assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.
+
+## 💻 Compatibilidade Universal
+O sistema foi desenvolvido com scripts universais que garantem o funcionamento idêntico em Windows (CMD/PowerShell), Linux e macOS.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -23,7 +25,6 @@ Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimiz
 - **Health Check:** Endpoint dedicado para verificação de status do sistema
 
 ## ✨ Funcionalidades
-
 - [x] **CRUD de Recursos:** Cadastro, listagem com paginação, edição e exclusão de materiais
 - [x] **Campos Suportados:** Título, Descrição, Tipo (Vídeo, PDF, Link), URL e Tags
 - [x] **Smart Assist (IA):** Botão para geração automática de metadados pedagógicos
@@ -32,9 +33,7 @@ Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimiz
 - [x] **Segurança:** Gestão de API Keys via variáveis de ambiente (.env)
 
 ## 🏗️ Arquitetura e IA (Prompt Engineering)
-
 O sistema utiliza um **Prompt de Sistema** eficiente para garantir que a IA responda em formato **JSON estrito**. A IA é instruída a atuar como um "Assistente Pedagógico", garantindo que as descrições sejam úteis e educativas para os alunos.
-
 Exemplo de log estruturado gerado (conforme requisito):
 `[INFO] AI Request: Title="Matemática Financeira", TokenUsage=150, Latency=1.2s`
 
@@ -43,6 +42,7 @@ Exemplo de log estruturado gerado (conforme requisito):
 ### Pré-requisitos
 - Python 3.10+
 - Node.js 18+
+- Git
 - Uma API Key do Groq
 
 ### Clonar projeto do GitHub
